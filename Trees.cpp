@@ -1,30 +1,30 @@
 #include <iostream>
 #include <list>
-#include<windows.h>
+#include <windows.h>
 #include <string>
 
 using namespace std;
 
-class TreesComponent
+class MilitaryComponent
 {
 protected:
-    TreesComponent* parent;
+    MilitaryComponent* parent;
 
 public:
-    virtual ~TreesComponent() {}
+    virtual ~MilitaryComponent() {}
 
-    void SetParent(TreesComponent* parent)
+    void SetParent(MilitaryComponent* parent)
     {
         this->parent = parent;
     }
 
-    TreesComponent* GetParent()
+    MilitaryComponent* GetParent()
     {
         return this->parent;
     }
 
-    virtual void Add(TreesComponent* component) {}
-    virtual void Remove(TreesComponent* component) {}
+    virtual void Add(MilitaryComponent* component) {}
+    virtual void Remove(MilitaryComponent* component) {}
 
     virtual bool IsComposite()
     {
@@ -34,30 +34,44 @@ public:
     virtual string GetName() = 0;
 };
 
-class Leaf : public TreesComponent
+class Soldier : public MilitaryComponent
 {
+private:
+    string name;
+
 public:
+    Soldier(string name)
+    {
+        this->name = name;
+    }
+
     string GetName() override
     {
-        return "Leaf";
+        return "Солдат: " + name;
     }
 };
 
-class Branch : public TreesComponent
+class Unit : public MilitaryComponent
 {
 protected:
-    list<TreesComponent*> childrens;
+    list<MilitaryComponent*> soldiers;
+    string unitName;
 
 public:
-    void Add(TreesComponent* component) override
+    Unit(string name)
     {
-        childrens.push_back(component);
+        unitName = name;
+    }
+
+    void Add(MilitaryComponent* component) override
+    {
+        soldiers.push_back(component);
         component->SetParent(this);
     }
 
-    void Remove(TreesComponent* component) override
+    void Remove(MilitaryComponent* component) override
     {
-        childrens.remove(component);
+        soldiers.remove(component);
         component->SetParent(nullptr);
     }
 
@@ -68,40 +82,43 @@ public:
 
     string GetName() override
     {
-        string result;
+        string result = unitName + ": ";
 
-        for (auto component : childrens)
+        for (auto component : soldiers)
         {
-            result += component->GetName() + " ";
+            result += component->GetName() + " | ";
         }
 
-        return "Branch: " + result;
+        return result;
     }
 };
 
-void ConnectedElements(TreesComponent* component1, TreesComponent* component2)
+void ConnectedElements(MilitaryComponent* unit, MilitaryComponent* soldier)
 {
-    if (component1->IsComposite())
+    if (unit->IsComposite())
     {
-        component1->Add(component2);
+        unit->Add(soldier);
     }
 
-    cout << "Результат: " << component1->GetName() << endl;
+    cout << "Структура: " << unit->GetName() << endl;
 }
 
 int main()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
-    TreesComponent* leaf = new Leaf();
-    TreesComponent* branch = new Branch();
 
-    ConnectedElements(branch, leaf);
+    MilitaryComponent* soldier1 = new Soldier("Иванов");
+    MilitaryComponent* soldier2 = new Soldier("Петров");
 
-    delete leaf;
-    delete branch;
+    MilitaryComponent* squad = new Unit("Отделение");
 
-    return 0;
-}
+    ConnectedElements(squad, soldier1);
+    ConnectedElements(squad, soldier2);
+
+    delete soldier1;
+    delete soldier2;
+    delete squad;
+
     return 0;
 }
