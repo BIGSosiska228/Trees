@@ -1,5 +1,6 @@
-﻿#include <iostream>
+#include <iostream>
 #include <list>
+#include<windows.h>
 #include <string>
 
 using namespace std;
@@ -90,6 +91,8 @@ void ConnectedElements(TreesComponent* component1, TreesComponent* component2)
 
 int main()
 {
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
     TreesComponent* leaf = new Leaf();
     TreesComponent* branch = new Branch();
 
@@ -98,5 +101,7 @@ int main()
     delete leaf;
     delete branch;
 
+    return 0;
+}
     return 0;
 }
