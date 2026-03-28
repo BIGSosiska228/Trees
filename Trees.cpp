@@ -1,7 +1,6 @@
 #include <iostream>
 #include <list>
 #include <windows.h>
-#include <string>
 
 using namespace std;
 
@@ -31,7 +30,7 @@ public:
         return false;
     }
 
-    virtual string GetName() = 0;
+    virtual int CountCommand() = 0;
 };
 
 class Soldier : public MilitaryComponent
@@ -45,16 +44,16 @@ public:
         this->name = name;
     }
 
-    string GetName() override
+    int CountCommand() override
     {
-        return "Солдат: " + name;
+        return 1;
     }
 };
 
 class Unit : public MilitaryComponent
 {
-protected:
-    list<MilitaryComponent*> soldiers;
+private:
+    list<MilitaryComponent*> components;
     string unitName;
 
 public:
@@ -65,13 +64,13 @@ public:
 
     void Add(MilitaryComponent* component) override
     {
-        soldiers.push_back(component);
+        components.push_back(component);
         component->SetParent(this);
     }
 
     void Remove(MilitaryComponent* component) override
     {
-        soldiers.remove(component);
+        components.remove(component);
         component->SetParent(nullptr);
     }
 
@@ -80,16 +79,16 @@ public:
         return true;
     }
 
-    string GetName() override
+    int CountCommand() override
     {
-        string result = unitName + ": ";
+        int total = 0;
 
-        for (auto component : soldiers)
+        for (auto component : components)
         {
-            result += component->GetName() + " | ";
+            total += component->CountCommand();
         }
 
-        return result;
+        return total;
     }
 };
 
@@ -100,7 +99,7 @@ void ConnectedElements(MilitaryComponent* unit, MilitaryComponent* soldier)
         unit->Add(soldier);
     }
 
-    cout << "Структура: " << unit->GetName() << endl;
+    cout << "Командный состав армии: " << unit->CountCommand() << endl;
 }
 
 int main()
@@ -110,14 +109,17 @@ int main()
 
     MilitaryComponent* soldier1 = new Soldier("Иванов");
     MilitaryComponent* soldier2 = new Soldier("Петров");
+    MilitaryComponent* soldier3 = new Soldier("Сидоров");
 
     MilitaryComponent* squad = new Unit("Отделение");
 
     ConnectedElements(squad, soldier1);
     ConnectedElements(squad, soldier2);
+    ConnectedElements(squad, soldier3);
 
     delete soldier1;
     delete soldier2;
+    delete soldier3;
     delete squad;
 
     return 0;
