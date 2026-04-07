@@ -17,11 +17,6 @@ public:
         this->parent = parent;
     }
 
-    MilitaryComponent* GetParent()
-    {
-        return this->parent;
-    }
-
     virtual void Add(MilitaryComponent* component) {}
     virtual void Remove(MilitaryComponent* component) {}
 
@@ -62,16 +57,18 @@ public:
         unitName = name;
     }
 
+    ~Unit()
+    {
+        for (auto component : components)
+        {
+            delete component;
+        }
+    }
+
     void Add(MilitaryComponent* component) override
     {
         components.push_back(component);
         component->SetParent(this);
-    }
-
-    void Remove(MilitaryComponent* component) override
-    {
-        components.remove(component);
-        component->SetParent(nullptr);
     }
 
     bool IsComposite() override
@@ -90,37 +87,43 @@ public:
 
         return total;
     }
-};
 
-void ConnectedElements(MilitaryComponent* unit, MilitaryComponent* soldier)
-{
-    if (unit->IsComposite())
+    string GetName()
     {
-        unit->Add(soldier);
+        return unitName;
     }
-
-    cout << "Командный состав армии: " << unit->CountCommand() << endl;
-}
+};
 
 int main()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
-    MilitaryComponent* soldier1 = new Soldier("Иванов");
-    MilitaryComponent* soldier2 = new Soldier("Петров");
-    MilitaryComponent* soldier3 = new Soldier("Сидоров");
 
-    MilitaryComponent* squad = new Unit("Отделение");
+    Unit* army = new Unit("Армия");
 
-    ConnectedElements(squad, soldier1);
-    ConnectedElements(squad, soldier2);
-    ConnectedElements(squad, soldier3);
 
-    delete soldier1;
-    delete soldier2;
-    delete soldier3;
-    delete squad;
+    Unit* squad1 = new Unit("Отделение 1");
+    Unit* squad2 = new Unit("Отделение 2");
+
+
+    squad1->Add(new Soldier("Иванов"));
+    squad1->Add(new Soldier("Петров"));
+
+    squad2->Add(new Soldier("Сидоров"));
+    squad2->Add(new Soldier("Смирнов"));
+
+
+    cout << squad1->GetName() << ": " << squad1->CountCommand() << " бойца" << endl;
+    cout << squad2->GetName() << ": " << squad2->CountCommand() << " бойца" << endl;
+
+
+    army->Add(squad1);
+    army->Add(squad2);
+
+    cout << "Вся армия: " << army->CountCommand() << " бойца" << endl;
+
+    delete army;
 
     return 0;
 }
